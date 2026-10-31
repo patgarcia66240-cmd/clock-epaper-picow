@@ -73,7 +73,7 @@ L'écran de configuration affiche le réseau, le mot de passe et l'adresse à ou
 
 ### Écran de configuration (e-paper)
 
-<img width="800" height="500" alt="image" src="https://github.com/user-attachments/assets/b8960e27-7c75-4747-b764-5768bfd44ae0" />
+<img width="800" height="400" alt="image" src="https://github.com/user-attachments/assets/b8960e27-7c75-4747-b764-5768bfd44ae0" />
 
 
 *Écran de configuration (e-paper)*
