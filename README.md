@@ -69,9 +69,11 @@ Téléphone ──► se connecte à "Horloge-Setup"
 
 Le mot de passe du point d'accès est dans `SetupPortal.h` (`AP_PASSWORD`). Tu peux le changer.
 
+L'écran de configuration affiche le réseau, le mot de passe et l'adresse à ouvrir, avec une icône pour chaque ligne.
+
 ### Écran de configuration (e-paper)
 
-![Écran de configuration (e-paper)](docs/ecran_configuration.png)
+![Écran de configuration (e-paper)](docs/ecran_configuration_v2.1.26.png)
 
 *Écran de configuration (e-paper)*
 
@@ -222,6 +224,7 @@ La version est dans `Horloge_PicoW.ino` : `FIRMWARE_VERSION`.
 - 2.1.23 : icônes météo plus épaisses (traits de 2 px, brouillard en bandes).
 - 2.1.24 : pages web (Wi-Fi et ville) : boutons en dégradé, effet au survol et focus sur les champs.
 - 2.1.25 : résultats de recherche en cartes (ville en gros, région dessous).
+- 2.1.26 : écran de configuration avec icônes (réseau, cadenas, globe).
 
 ---
 

@@ -39,8 +39,8 @@ AppConfig cfg;
 // Constantes
 // =====================================================
 // VERSION DU FIRMWARE : incrementer a CHAQUE modification du code (MAJEUR.MINEUR.CORRECTIF)
-// 2.0.0 = configuration Wi-Fi et ville ; 2.0.1 = numero de version ; 2.0.2 = police heure 130 px ; 2.0.3 = correction d'appel showInfoScreen ; 2.0.4 = diagnostic LittleFS (erreur affichee) ; 2.0.5 = adresse reelle du point d'acces ; 2.0.6 = sauvegarde robuste (formatage et nouvel essai) ; 2.0.7 = police heure corrigee (alignement des glyphes) ; 2.0.8 = heure en rafraichissement complet a chaque minute ; 2.0.9 = test police 84 px (mise en page d'origine) ; 2.0.10 = police heure 100 px ; 2.1.0 = ecran principal avec meteo, date, heure et saint ; 2.1.1 = rafraichissement partiel de l'heure remis ; 2.1.2 = espacement vertical date, heure, saint ; 2.1.3 = soleil en contour, pied de page avec region en petit ; 2.1.4 = heure descendue de 8 px ; 2.1.5 = lever et coucher du soleil sous le saint ; 2.1.6 = lignes meteo descendues de 5 px ; 2.1.7 = C de Celsius agrandi ; 2.1.8 = date en police 20 px ; 2.1.9 = region sans retour a la ligne, diagnostic serie ; 2.1.10 = region sur toute la largeur (police 26 px) ; 2.1.11 = page web de la ville embellie ; 2.1.12 = ecran de demarrage avec icones (ville et adresse) ; 2.1.13 = region sans le pays sur l'ecran ; 2.1.14 = nom de ville complet (buffer 128 octets) ; 2.1.15 = region en police 20 px ; 2.1.16 = choix de ville par indice (nom complet preserve) ; 2.1.17 = region en police 18 px ; 2.1.18 = region en police 15 px ; 2.1.19 = page web : region sur toute la largeur ; 2.1.20 = diagnostic de la ville (serie) ; 2.1.21 = ville et region separees dans la configuration ; 2.1.22 = migration de l'ancienne ville (virgule) ; 2.1.23 = icones meteo plus epaisses ; 2.1.24 = pages web : boutons en degrade et effet survol ; 2.1.25 = resultats de recherche en cartes (nom et region)
-static constexpr char FIRMWARE_VERSION[] = "2.1.25";
+// 2.0.0 = configuration Wi-Fi et ville ; 2.0.1 = numero de version ; 2.0.2 = police heure 130 px ; 2.0.3 = correction d'appel showInfoScreen ; 2.0.4 = diagnostic LittleFS (erreur affichee) ; 2.0.5 = adresse reelle du point d'acces ; 2.0.6 = sauvegarde robuste (formatage et nouvel essai) ; 2.0.7 = police heure corrigee (alignement des glyphes) ; 2.0.8 = heure en rafraichissement complet a chaque minute ; 2.0.9 = test police 84 px (mise en page d'origine) ; 2.0.10 = police heure 100 px ; 2.1.0 = ecran principal avec meteo, date, heure et saint ; 2.1.1 = rafraichissement partiel de l'heure remis ; 2.1.2 = espacement vertical date, heure, saint ; 2.1.3 = soleil en contour, pied de page avec region en petit ; 2.1.4 = heure descendue de 8 px ; 2.1.5 = lever et coucher du soleil sous le saint ; 2.1.6 = lignes meteo descendues de 5 px ; 2.1.7 = C de Celsius agrandi ; 2.1.8 = date en police 20 px ; 2.1.9 = region sans retour a la ligne, diagnostic serie ; 2.1.10 = region sur toute la largeur (police 26 px) ; 2.1.11 = page web de la ville embellie ; 2.1.12 = ecran de demarrage avec icones (ville et adresse) ; 2.1.13 = region sans le pays sur l'ecran ; 2.1.14 = nom de ville complet (buffer 128 octets) ; 2.1.15 = region en police 20 px ; 2.1.16 = choix de ville par indice (nom complet preserve) ; 2.1.17 = region en police 18 px ; 2.1.18 = region en police 15 px ; 2.1.19 = page web : region sur toute la largeur ; 2.1.20 = diagnostic de la ville (serie) ; 2.1.21 = ville et region separees dans la configuration ; 2.1.22 = migration de l'ancienne ville (virgule) ; 2.1.23 = icones meteo plus epaisses ; 2.1.24 = pages web : boutons en degrade et effet survol ; 2.1.25 = resultats de recherche en cartes (nom et region) ; 2.1.26 = ecran de configuration avec icones
+static constexpr char FIRMWARE_VERSION[] = "2.1.26";
 static constexpr uint32_t SERIAL_BAUDRATE = 115200;
 static constexpr unsigned long ONE_SECOND_MS = 1000UL;
 static constexpr unsigned long NTP_RETRY_INTERVAL_MS = 30000UL;  // 30 s entre deux tentatives apres echec
@@ -1280,12 +1280,78 @@ void enterSetupMode()
 {
   Serial.println("Mode configuration Wi-Fi");
   startWifiSetupAp(cfg);
-  showInfoScreen("Configuration Wi-Fi",
-                 String("Reseau : ") + AP_SSID,
-                 String("Mot de passe : ") + AP_PASSWORD,
-                 "Ouvrir http://" + WiFi.softAPIP().toString());
+  drawSetupScreen(String(AP_SSID), String(AP_PASSWORD), "http://" + WiFi.softAPIP().toString() + "/", String("Version ") + FIRMWARE_VERSION);
   waitWifiSetup(SETUP_TIMEOUT_MS);
   rp2040.restart();
+}
+
+// Icone cadenas (mot de passe) : cy = haut du corps
+void drawLockIcon(int cx, int cy)
+{
+  display.fillCircle(cx, cy, 9, GxEPD_BLACK);
+  display.fillCircle(cx, cy, 7, GxEPD_WHITE);
+  display.fillRoundRect(cx - 14, cy, 28, 22, 4, GxEPD_BLACK);
+  display.fillCircle(cx, cy + 10, 3, GxEPD_WHITE);
+}
+
+// Icone globe (adresse web)
+void drawGlobeIcon(int cx, int cy)
+{
+  display.drawCircle(cx, cy, 14, GxEPD_BLACK);
+  display.drawCircle(cx, cy, 13, GxEPD_BLACK);
+  display.drawFastHLine(cx - 14, cy, 29, GxEPD_BLACK);
+  display.drawFastVLine(cx, cy - 14, 29, GxEPD_BLACK);
+  display.drawCircle(cx, cy, 7, GxEPD_BLACK);
+}
+
+// Libelle petit + valeur grande, a partir de la ligne y
+void drawSetupRow(int y, const char* label, const String& value)
+{
+  display.setFont(&Roboto_Bold_15);
+  display.setCursor(100, y);
+  display.print(label);
+  display.setFont(&Roboto_Bold_24);
+  display.setCursor(100, y + 28);
+  display.print(value);
+}
+
+// Ecran de configuration (point d'acces) : reseau, mot de passe et adresse
+void drawSetupScreen(const String& ssid, const String& pass, const String& url, const String& version)
+{
+  display.setFont(&Roboto_Bold_15);
+  const TextMetrics vm = measureText(version.c_str(), &Roboto_Bold_15);
+
+  display.setFullWindow();
+  display.firstPage();
+  do
+  {
+    display.fillScreen(GxEPD_WHITE);
+    display.setTextColor(GxEPD_BLACK);
+
+    // Titre
+    display.setFont(&Roboto_Bold_26);
+    display.setCursor(LEFT_X + 8, 66);
+    display.print("Configuration Wi-Fi");
+    display.drawFastHLine(40, 86, SCREEN_W - 80, GxEPD_BLACK);
+
+    // Reseau
+    drawWifiIcon(60, 132);
+    drawSetupRow(114, "Reseau", ssid);
+    display.drawFastHLine(100, 158, SCREEN_W - 140, GxEPD_BLACK);
+
+    // Mot de passe
+    drawLockIcon(60, 188);
+    drawSetupRow(178, "Mot de passe", pass);
+    display.drawFastHLine(100, 220, SCREEN_W - 140, GxEPD_BLACK);
+
+    // Adresse
+    drawGlobeIcon(60, 252);
+    drawSetupRow(240, "Ouvrir dans le navigateur", url);
+
+    display.setFont(&Roboto_Bold_15);
+    display.setCursor(SCREEN_W - LEFT_X - (vm.x1 + vm.w), 272);
+    display.print(version);
+  } while (display.nextPage());
 }
 
 // Icone epingle (ville)
